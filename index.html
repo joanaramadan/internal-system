@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo & Helios SPA Resort - Internal Hotel System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primary: #1a2a6c; --secondary: #b21f1f; --accent: #fdbb2d; --light: #f4f7f6; --dark: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; display: flex; flex-direction: column; min-height: 100vh; color: var(--dark); }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--primary); color: white; padding: 25px; position: fixed; height: 100vh; z-index: 100; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .brand { border-bottom: 2px solid var(--accent); padding-bottom: 15px; margin-bottom: 25px; }
+        .dev-tag { font-size: 0.75rem; color: var(--accent); font-weight: bold; text-transform: uppercase; }
+
+        /* Content */
+        .main-content { margin-left: 310px; padding: 30px; width: calc(100% - 350px); flex-grow: 1; padding-bottom: 120px; }
+        .lang-container { position: absolute; top: 25px; right: 40px; z-index: 1001; }
+        .lang-select { padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd; font-weight: bold; cursor: pointer; background: white; }
+
+        /* GDPR Modal */
+        #consent-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(26, 42, 108, 0.98); }
+        .modal-content { background: white; width: 90%; max-width: 650px; margin: 10vh auto; padding: 40px; border-radius: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .legal-scroll { height: 250px; overflow-y: scroll; background: #f9f9f9; padding: 15px; border: 1px solid #eee; margin: 20px 0; font-size: 0.9rem; text-align: left; line-height: 1.5; }
+
+        /* Tables & Buttons */
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #f8f9fa; color: var(--primary); padding: 12px; border-bottom: 2px solid var(--accent); }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-main { background: var(--primary); color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-main:hover { background: var(--secondary); }
+
+        /* Footer */
+        .legal-footer { background: #fff; padding: 30px; text-align: center; border-top: 3px solid var(--accent); margin-left: 260px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div class="lang-container">
+    <select class="lang-select" onchange="setLanguage(this.value)">
+        <option value="bg">🇧🇬 Български</option>
+        <option value="en">🇬🇧 English</option>
+    </select>
+</div>
+
+<div id="consent-modal">
+    <div class="modal-content">
+        <h2 id="txt-con-title" style="color:var(--primary)">Декларация за съгласие</h2>
+        <div class="legal-scroll" id="txt-con-body">
+            </div>
+        <button class="btn-main" onclick="acceptConsent()" id="txt-con-btn">Приемам и потвърждавам</button>
+    </div>
+</div>
+
+<div class="sidebar">
+    <div class="brand">
+        <h2 style="margin:0; font-size: 1.4rem;">Apollo & Helios</h2>
+        <div class="dev-tag">Property of Y.Ramadan</div>
+    </div>
+    <div id="user-display" style="font-size:0.85rem; margin-bottom:30px; color: var(--accent)">Зареждане...</div>
+    <nav>
+        <p id="nav-1">📊 Оперативно табло</p>
+        <p id="nav-2">🏨 Статус на стаи</p>
+        <p id="nav-3" style="color:#ff7675" onclick="supabase.auth.signOut()">Изход</p>
+    </nav>
+</div>
+
+<div class="main-content">
+    <h1 id="txt-main-h">Apollo & Helios SPA Resort</h1>
+    <div class="card">
+        <h3 id="txt-new-req">Нова заявка</h3>
+        <input type="text" id="in-room" placeholder="Стая №" style="width:80px">
+        <select id="in-cat">
+            <option value="Maintenance">Maintenance / Техническа</option>
+            <option value="Housekeeping">Housekeeping / Почистване</option>
+            <option value="Mini-bar">Mini-bar / Минибар</option>
+        </select>
+        <input type="text" id="in-desc" placeholder="Детайли..." style="width:250px">
+        <button class="btn-main" onclick="addTicket()">Запиши</button>
+    </div>
+
+    <div class="card">
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th id="th-1">Стая</th>
+                    <th id="th-2">Отдел</th>
+                    <th id="th-3">Статус</th>
+                    <th id="th-4">Действие</th>
+                </tr>
+            </thead>
+            <tbody id="ticket-list"></tbody>
+        </table>
+    </div>
+</div>
+
+<footer class="legal-footer">
+    <div id="txt-footer-top">© 2026 Apollo & Helios SPA Resort. Всички права запазени. Разработено от Y.Ramadan.</div>
+    <div id="txt-footer-bottom" style="color:#7f8c8d; max-width: 800px; margin: 15px auto; line-height: 1.6;">
+        </div>
+</footer>
+
+<script>
+    const SB_URL = 'https://qajmppuihmorlzljjltm.supabase.co';
+    const SB_KEY = 'sb_publishable_XPsK25mBIL5bvmVtuzU2Ww_FDS-SLQ5';
+    const supabase = supabase.createClient(SB_URL, SB_KEY);
+
+    const i18n = {
+        bg: {
+            conTitle: "Правна Декларация и Регламент",
+            conBody: `<b>1. GDPR:</b> С настоящото потвърждавам, че съм запознат с Регламент (ЕС) 2016/679 и Закона за защита на личните данни (ЗЗЛД).<br><br><b>2. Мониторинг:</b> Съгласявам се моите работни активности в системата на Apollo & Helios SPA Resort да бъдат записвани за целите на одита и качеството.<br><br><b>3. Конфиденциалност:</b> Задължавам се да не предоставям достъп до системата на трети лица под никакъв предлог.<br><br><b>4. Авторски права:</b> Системата е интелектуална собственост на Y.Ramadan.`,
+            conBtn: "Приемам и влизам",
+            mainH: "Apollo & Helios SPA Resort - Вътрешна Хотелска Система",
+            newReq: "Добавяне на оперативен сигнал",
+            footerB: "Всички данни се обработват съгласно GDPR и вътрешния правилник на Apollo & Helios SPA Resort. Достъпът е разрешен само за оторизиран персонал. Всяко нарушение се докладва на системния администратор Y.Ramadan.",
+            nav1: "📊 Оперативно табло", nav2: "🏨 Статус на стаи", th1: "Стая", th2: "Отдел", th3: "Статус", th4: "Действие"
+        },
+        en: {
+            conTitle: "Legal Declaration & Regulation",
+            conBody: `<b>1. GDPR:</b> I hereby confirm awareness of Regulation (EU) 2016/679 and the Personal Data Protection Act.<br><br><b>2. Monitoring:</b> I agree that my professional activities within the Apollo & Helios SPA Resort system will be logged for audit and quality purposes.<br><br><b>3. Confidentiality:</b> I commit to not providing system access to third parties under any circumstances.<br><br><b>4. Copyright:</b> System is the intellectual property of Y.Ramadan.`,
+            conBtn: "I Accept & Continue",
+            mainH: "Apollo & Helios SPA Resort - Internal Hotel System",
+            newReq: "New Operational Ticket",
+            footerB: "Data is processed in compliance with GDPR and Apollo & Helios SPA Resort internal regulations. Authorized personnel only. Any breach is reported to the system administrator Y.Ramadan.",
+            nav1: "📊 Dashboard", nav2: "🏨 Room Status", th1: "Room", th2: "Dept", th3: "Status", th4: "Action"
+        }
+    };
+
+    function setLanguage(lang) {
+        document.getElementById('txt-con-title').innerText = i18n[lang].conTitle;
+        document.getElementById('txt-con-body').innerHTML = i18n[lang].conBody;
+        document.getElementById('txt-con-btn').innerText = i18n[lang].conBtn;
+        document.getElementById('txt-main-h').innerText = i18n[lang].mainH;
+        document.getElementById('txt-new-req').innerText = i18n[lang].newReq;
+        document.getElementById('txt-footer-bottom').innerText = i18n[lang].footerB;
+        document.getElementById('nav-1').innerText = i18n[lang].nav1;
+        document.getElementById('nav-2').innerText = i18n[lang].nav2;
+        document.getElementById('th-1').innerText = i18n[lang].th1;
+        document.getElementById('th-2').innerText = i18n[lang].th2;
+        document.getElementById('th-3').innerText = i18n[lang].th3;
+        document.getElementById('th-4').innerText = i18n[lang].th4;
+    }
+
+    async function init() {
+        setLanguage('bg');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return document.getElementById('user-display').innerText = "Очаква се вход...";
+        
+        document.getElementById('user-display').innerText = `Служител: ${user.email}`;
+
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (profile && !profile.has_consented) {
+            document.getElementById('consent-modal').style.display = 'block';
+        } else {
+            fetchTickets();
+        }
+    }
+
+    async function acceptConsent() {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('profiles').update({ has_consented: true, consent_date: new Date() }).eq('id', user.id);
+        document.getElementById('consent-modal').style.display = 'none';
+        fetchTickets();
+    }
+
+    async function addTicket() {
+        const room = document.getElementById('in-room').value;
+        const cat = document.getElementById('in-cat').value;
+        const desc = document.getElementById('in-desc').value;
+        if(!room) return alert("Въведете стая!");
+        await supabase.from('tickets').insert([{ room_id: room, category: cat, description: desc }]);
+        fetchTickets();
+    }
+
+    async function fetchTickets() {
+        const { data } = await supabase.from('tickets').select('*').order('updated_at', {ascending: false});
+        const list = document.getElementById('ticket-list');
+        list.innerHTML = data.map(t => `
+            <tr>
+                <td><b>${t.room_id}</b></td>
+                <td>${t.category}</td>
+                <td>${t.status}</td>
+                <td><button class="btn-main" style="padding:5px 10px" onclick="updateStatus('${t.id}')">OK</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function updateStatus(id) {
+        await supabase.from('tickets').update({status: 'done'}).eq('id', id);
+        fetchTickets();
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
