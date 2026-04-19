@@ -1,6 +1,10 @@
 /**
  * HMS Bulgaria - Enterprise Logic v2.8 (Full Multilingual)
  */
+// === КОНФИГУРАЦИЯ ===
+const SB_URL = "https://qajmppuihmorlzljjltm.supabase.co"; 
+const SB_KEY = "sb_publishable_XPsK25mBIL5bvmVtuzU2Ww_FDS-SLQ5"; // Сложи ключа директно тук
+const TG_TOKEN = "8645929996:AAHIPLMxDYh-ycxdIKbuld92yDA36EWTFQE"; // Сложи токена директно тук
 
 // === 1. РЕЧНИК С ПРЕВОДИ ===
 const translations = {
