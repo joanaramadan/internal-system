@@ -1,0 +1,61 @@
+:root {
+    --primary: #1a2a6c;
+    --dark: #2c3e50;
+    --danger: #e74c3c;
+    --light: #ecf0f1;
+    --accent: #f39c12;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; display: flex; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; min-height: 100vh; }
+
+/* СТРАНИЧНО МЕНЮ */
+.sidebar { width: 260px; height: 100vh; background: var(--dark); color: white; position: sticky; top: 0; display: flex; flex-direction: column; }
+.sidebar-header { padding: 25px; font-size: 1.2em; font-weight: bold; background: rgba(0,0,0,0.2); text-align: center; }
+
+.nav-links { flex: 1; overflow-y: auto; }
+.nav-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; border-left: 5px solid transparent; }
+.nav-item:hover, .nav-item.active { background: var(--primary); border-left: 5px solid var(--accent); }
+.nav-item.logout { border-top: 1px solid rgba(255,255,255,0.1); }
+
+/* ОСНОВНО СЪДЪРЖАНИЕ */
+.main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.top-bar { height: 60px; background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+/* КАРТИ И ТАБЛО */
+.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+.kpi-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.kpi-card.danger { border-top: 4px solid var(--danger); }
+.kpi-card h3 { font-size: 0.9em; color: #7f8c8d; margin: 0; text-transform: uppercase; }
+.kpi-card p { font-size: 2em; font-weight: bold; margin: 10px 0 0; }
+
+/* ФОРМИ И КАРТИ */
+.card { background: white; margin: 20px; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+.field { display: flex; flex-direction: column; }
+.field.full { grid-column: span 2; }
+label { font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #555; }
+input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; }
+
+/* БУТОНИ */
+.btn-submit { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; width: 100%; }
+.btn-submit:hover { opacity: 0.9; }
+.btn-submit.danger { background: var(--danger); }
+
+/* ЛОГИН ЕКРАН (ВАЖНО!) */
+.login-overlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+.login-box { background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.login-box input { width: 100%; margin-bottom: 15px; }
+
+/* МОБИЛНА ВЕРСИЯ */
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .nav-links { display: flex; overflow-x: auto; }
+    .nav-item { white-space: nowrap; padding: 10px 15px; }
+    .grid-form { grid-template-columns: 1fr; }
+    .field.full { grid-column: span 1; }
+}
+
+.legal-footer { margin-top: auto; padding: 20px; font-size: 0.75em; color: #999; text-align: center; }
