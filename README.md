@@ -1,4 +1,4 @@
-# [PROD] Operational Portal 
+# Operational Portal 
 **Internal Enterprise Resource Planning (ERP) System**
 
 Професионална уеб-базирана платформа за координация на хотелски отдели в реално време. Системата автоматизира комуникацията между рецепция, техническа поддръжка и камериерски състав.
