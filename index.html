@@ -3,69 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMS Bulgaria | Internal Hotel System</title>
+    <title>HMS Bulgaria | Enterprise Hotel Management</title>
+    
+    <!-- Външни библиотеки -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome за икони (опционално, но препоръчително за по-добър UX) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
+<!-- ЛОГИН ЕКРАН -->
 <div id="login-screen" class="login-overlay" style="display: none;">
     <div class="login-box">
-        <h2>🏛 HMS LOGIN</h2>
-        <p>Въведете вашите данни за достъп</p>
+        <div class="login-logo">🏛 HMS APOLLO & HELIOS</div>
+        <h2>Вход в системата</h2>
         <input type="email" id="login-email" placeholder="Email">
         <input type="password" id="login-pass" placeholder="Password">
         <button class="btn-submit" onclick="handleLogin()">ВХОД</button>
+        <p class="login-footer">Enterprise Edition v3.0</p>
     </div>
 </div>
 
+<!-- СТРАНИЧНО МЕНЮ (Sidebar) -->
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">HMS APOLLO & HELIOS</div>
-    <div class="nav-links">
-        <div class="nav-item active" onclick="switchTab('dashboard')">📊 Табло</div>
-        <div class="nav-item" onclick="switchTab('maintenance')">🛠 Поддръжка</div>
-        <div class="nav-item" onclick="switchTab('housekeeping')">🧹 Камериерки</div>
-        <div class="nav-item" onclick="switchTab('reception')">🛎 Рецепция</div>
-        <div class="nav-item" onclick="switchTab('spa')">💆 SPA център</div>
-        <div class="nav-item" onclick="switchTab('restaurant')">🍽 Ресторант</div>
-        <div class="nav-item" onclick="switchTab('incidents')">🚑 Инциденти</div>
-        <div class="nav-item" onclick="switchTab('reports')">📑 Отчети & Експорт</div>
+    <div class="sidebar-header">
+        <span class="hotel-name">HMS BULGARIA</span>
+        <small>Premium Management</small>
     </div>
-    <div class="nav-item logout" style="margin-top: auto;" onclick="handleLogout()">🚪 Изход</div>
+    
+    <div class="nav-links">
+        <div class="nav-item active" onclick="switchTab('dashboard')">
+            <i class="fas fa-chart-line"></i> <span>Табло</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('room-matrix')">
+            <i class="fas fa-th"></i> <span>Матрица на стаите</span>
+        </div>
+        
+        <div class="nav-group-label">ОПЕРАЦИИ</div>
+        <div class="nav-item" onclick="switchTab('maintenance')">
+            <i class="fas fa-tools"></i> <span>Техн. поддръжка</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('housekeeping')">
+            <i class="fas fa-broom"></i> <span>Камериерки</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('reception')">
+            <i class="fas fa-concierge-bell"></i> <span>Рецепция</span>
+        </div>
+        
+        <div class="nav-group-label">КОМУНИКАЦИЯ</div>
+        <div class="nav-item" onclick="switchTab('handover')">
+            <i class="fas fa-book"></i> <span>Рапортна книга</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('checklists')">
+            <i class="fas fa-check-double"></i> <span>Чек-листи</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('sop')">
+            <i class="fas fa-graduation-cap"></i> <span>SOP Наръчник</span>
+        </div>
+
+        <div class="nav-group-label">СИГУРНОСТ</div>
+        <div class="nav-item danger" onclick="switchTab('incidents')">
+            <i class="fas fa-ambulance"></i> <span>ИНЦИДЕНТИ</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('reports')">
+            <i class="fas fa-file-export"></i> <span>Отчети & Експорт</span>
+        </div>
+    </div>
+
+    <div class="nav-item logout" onclick="handleLogout()">
+        <i class="fas fa-sign-out-alt"></i> <span>Изход</span>
+    </div>
 </div>
 
+<!-- ОСНОВНО СЪДЪРЖАНИЕ -->
 <div class="main-content">
+    <!-- Топ лента -->
     <div class="top-bar">
-        <div id="user-info">Добре дошли, <strong id="user-email">...</strong></div>
-        <select class="lang-select" onchange="changeLang(this.value)">
-            <option value="bg">Български (BG)</option>
-            <option value="en">English (EN)</option>
-        </select>
-    </div>
-
-    <div id="dashboard-section" class="section active">
-        <div class="dashboard-grid">
-            <div class="kpi-card"><h3>Активни задачи</h3><div class="value" id="kpi-tickets">0</div></div>
-            <div class="kpi-card danger"><h3>Спешни инциденти</h3><div class="value" id="kpi-incidents">0</div></div>
-            <div class="kpi-card accent"><h3>Средно време</h3><div class="value">14 min</div></div>
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Търсене на стая или SOP..." id="global-search">
         </div>
-        <canvas id="statsChart" style="max-height: 300px; padding: 20px;"></canvas>
+        <div class="top-bar-right">
+            <div class="notifications">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge">0</span>
+            </div>
+            <div class="user-profile">
+                <span id="user-email">...</span>
+                <select class="lang-select" onchange="changeLang(this.value)">
+                    <option value="bg">BG</option>
+                    <option value="en">EN</option>
+                </select>
+            </div>
+        </div>
     </div>
 
-    <div id="form-container" class="section" style="display: none;"></div>
+    <!-- СЕКЦИЯ: ТАБЛО (Dashboard) -->
+    <div id="dashboard-section" class="section active">
+        <div class="kpi-container">
+            <div class="kpi-card">
+                <h3>Активни задачи</h3>
+                <p id="kpi-tickets">0</p>
+                <small>В реално време</small>
+            </div>
+            <div class="kpi-card danger">
+                <h3>Спешни сигнали</h3>
+                <p id="kpi-incidents">0</p>
+                <small>Изискват внимание</small>
+            </div>
+            <div class="kpi-card success">
+                <h3>Завършени (Днес)</h3>
+                <p id="kpi-completed">0</p>
+                <small>Ефективност 92%</small>
+            </div>
+        </div>
+        
+        <div class="card chart-card">
+            <canvas id="statsChart"></canvas>
+        </div>
 
+        <div id="live-monitor-container">
+            <!-- Светофарна система се генерира тук -->
+        </div>
+    </div>
+
+    <!-- СЕКЦИЯ: МАТРИЦА НА СТАИТЕ (HotelTime Style) -->
+    <div id="matrix-section" class="section" style="display: none;">
+        <div class="matrix-controls">
+            <h2>🏨 Room Grid Matrix</h2>
+            <div class="matrix-legend">
+                <span class="legend-item"><span class="dot clean"></span> Чиста</span>
+                <span class="legend-item"><span class="dot dirty"></span> Мръсна</span>
+                <span class="legend-item"><span class="dot process"></span> В процес</span>
+                <span class="legend-item"><span class="dot ooo"></span> Ремонт</span>
+            </div>
+        </div>
+
+        <div class="wing-wrapper">
+            <!-- КРИЛО APOLLO -->
+            <div class="wing-container">
+                <div class="wing-title">🏛 КРИЛО APOLLO (Стаи 01-29)</div>
+                <div id="apollo-grid" class="floor-grid">
+                    <!-- Генерира се динамично чрез JS -->
+                </div>
+            </div>
+
+            <!-- КРИЛО HELIOS -->
+            <div class="wing-container">
+                <div class="wing-title">☀️ КРИЛО HELIOS (Стаи 30-58)</div>
+                <div id="helios-grid" class="floor-grid">
+                    <!-- Генерира се динамично чрез JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЕКЦИЯ: ДИНАМИЧНИ ФОРМИ (Maintenance, HK, etc.) -->
+    <div id="form-container" class="section" style="display: none;">
+        <!-- Съдържанието се рендира от renderForm() -->
+    </div>
+
+    <!-- СЕКЦИЯ: ОТЧЕТИ -->
     <div id="reports-section" class="section" style="display: none;">
-        <h2>Отчетност и Експорт</h2>
-        <button class="btn-export" onclick="exportToCSV('tickets')">Export Tickets to CSV</button>
-        <button class="btn-export" onclick="exportToCSV('incidents')">Export Incidents to CSV</button>
+        <div class="card">
+            <h2>📑 Отчети и Архивация</h2>
+            <div class="export-grid">
+                <button class="btn-export" onclick="exportToCSV('tickets')">
+                    <i class="fas fa-file-csv"></i> Експорт на Тикети
+                </button>
+                <button class="btn-export" onclick="exportToCSV('incidents')">
+                    <i class="fas fa-file-alt"></i> Експорт на Инциденти
+                </button>
+                <button class="btn-export" onclick="exportToCSV('checklists')">
+                    <i class="fas fa-clipboard-check"></i> Архив Чек-листи
+                </button>
+            </div>
+        </div>
     </div>
 
+    <!-- ФУТЪР -->
     <footer class="legal-footer">
-        <strong>Законова рамка и съответствие:</strong><br>
-        Системата работи в съответствие с <strong>GDPR (Регламент (ЕС) 2016/679)</strong> и <strong>Закона за туризма на РБ</strong>.
-        Всички записи в Audit Log се пазят 5 години.
+        <div class="footer-content">
+            <strong>HMS Bulgaria Security Protocol:</strong> GDPR Compliant | Audit Log Active<br>
+            © 2024 HMS Apollo & Helios - Всички записи се пазят 5 години съгласно ЗТ.
+        </div>
     </footer>
+</div>
+
+<!-- QUICK ACTION BUTTON (Hot SOS Style) -->
+<div class="fab" onclick="switchTab('maintenance')" title="Бърз сигнал">
+    <i class="fas fa-plus"></i>
+</div>
+
+<!-- Модален прозорец за стая (Room Details) -->
+<div id="room-modal" class="modal" style="display:none;">
+    <!-- Тук ще се показва инфо за стаята при клик -->
 </div>
 
 <script src="script.js"></script>
