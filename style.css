@@ -1,61 +1,308 @@
+
+/* HMS BULGARIA - LUXURY ENTERPRISE DESIGN v3.0 */
 :root {
-    --primary: #1a2a6c;
-    --dark: #2c3e50;
-    --danger: #e74c3c;
-    --light: #ecf0f1;
-    --accent: #f39c12;
+    --primary: #1a237e;      /* Дълбоко синьо (Luxury Trust) */
+    --accent: #c5a059;       /* Приглушено злато (Premium) */
+    --bg-light: #f8f9fa;     /* Светъл фон */
+    --text-dark: #2c3e50;    /* Тъмен текст */
+    --text-light: #95a5a6;   /* Помощен текст */
+    --white: #ffffff;
+    --danger: #d32f2f;       /* Елегантно червено */
+    --success: #2e7d32;      /* Елегантно зелено */
+    --warning: #ffa000;      /* Кехлибар */
+    --sidebar-width: 280px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-* { box-sizing: border-box; }
-
-body { margin: 0; display: flex; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; min-height: 100vh; }
-
-/* СТРАНИЧНО МЕНЮ */
-.sidebar { width: 260px; height: 100vh; background: var(--dark); color: white; position: sticky; top: 0; display: flex; flex-direction: column; }
-.sidebar-header { padding: 25px; font-size: 1.2em; font-weight: bold; background: rgba(0,0,0,0.2); text-align: center; }
-
-.nav-links { flex: 1; overflow-y: auto; }
-.nav-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; border-left: 5px solid transparent; }
-.nav-item:hover, .nav-item.active { background: var(--primary); border-left: 5px solid var(--accent); }
-.nav-item.logout { border-top: 1px solid rgba(255,255,255,0.1); }
-
-/* ОСНОВНО СЪДЪРЖАНИЕ */
-.main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.top-bar { height: 60px; background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
-/* КАРТИ И ТАБЛО */
-.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-.kpi-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-.kpi-card.danger { border-top: 4px solid var(--danger); }
-.kpi-card h3 { font-size: 0.9em; color: #7f8c8d; margin: 0; text-transform: uppercase; }
-.kpi-card p { font-size: 2em; font-weight: bold; margin: 10px 0 0; }
-
-/* ФОРМИ И КАРТИ */
-.card { background: white; margin: 20px; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-.field { display: flex; flex-direction: column; }
-.field.full { grid-column: span 2; }
-label { font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #555; }
-input, select, textarea { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; }
-
-/* БУТОНИ */
-.btn-submit { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; width: 100%; }
-.btn-submit:hover { opacity: 0.9; }
-.btn-submit.danger { background: var(--danger); }
-
-/* ЛОГИН ЕКРАН (ВАЖНО!) */
-.login-overlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-.login-box { background: white; padding: 40px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.login-box input { width: 100%; margin-bottom: 15px; }
-
-/* МОБИЛНА ВЕРСИЯ */
-@media (max-width: 768px) {
-    body { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: relative; }
-    .nav-links { display: flex; overflow-x: auto; }
-    .nav-item { white-space: nowrap; padding: 10px 15px; }
-    .grid-form { grid-template-columns: 1fr; }
-    .field.full { grid-column: span 1; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
 }
 
-.legal-footer { margin-top: auto; padding: 20px; font-size: 0.75em; color: #999; text-align: center; }
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR - SLEEK DARK DESIGN */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #0f172a; /* Още по-тъмен нюанс за лукс */
+    color: var(--white);
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 40px 30px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.hotel-name {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+}
+
+.sidebar-header small {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.65rem;
+    opacity: 0.6;
+}
+
+.nav-links {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.nav-group-label {
+    padding: 20px 30px 10px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+.nav-item {
+    padding: 14px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.nav-item i { width: 20px; font-size: 1.1rem; }
+
+.nav-item:hover, .nav-item.active {
+    background: rgba(197, 160, 89, 0.1);
+    color: var(--white);
+    border-right: 3px solid var(--accent);
+}
+
+.nav-item.danger { color: #ff7675; }
+
+.logout {
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 25px 30px;
+}
+
+/* MAIN CONTENT AREA */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-bar {
+    height: 80px;
+    background: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    box-shadow: var(--shadow);
+}
+
+/* SEARCH BAR */
+.search-wrapper {
+    background: #f1f5f9;
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    width: 400px;
+}
+
+.search-wrapper input {
+    background: none;
+    border: none;
+    outline: none;
+    margin-left: 10px;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+/* KPI CARDS - ELEGANT CARDS */
+.kpi-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    padding: 40px;
+}
+
+.kpi-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border-bottom: 3px solid transparent;
+    transition: transform 0.3s;
+}
+
+.kpi-card:hover { transform: translateY(-5px); }
+.kpi-card.danger { border-bottom-color: var(--danger); }
+.kpi-card.success { border-bottom-color: var(--success); }
+
+.kpi-card h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-light);
+    letter-spacing: 1px;
+}
+
+.kpi-card p {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 10px 0;
+    color: var(--primary);
+}
+
+/* ROOM MATRIX - HOTELTIME STYLE */
+.wing-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 0 40px 40px;
+}
+
+.wing-container {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.wing-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.floor-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.floor-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    gap: 6px;
+}
+
+.floor-label {
+    grid-column: 1 / -1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-top: 10px;
+}
+
+.room-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.room-box.clean { background: #e8f5e9; color: var(--success); border: 1px solid #c8e6c9; }
+.room-box.dirty { background: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; }
+.room-box.process { background: #fff8e1; color: var(--warning); border: 1px solid #ffecb3; }
+.room-box.ooo { background: #eceff1; color: #455a64; border: 1px solid #cfd8dc; }
+
+.room-box:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* FORMS & CARDS */
+.card {
+    background: var(--white);
+    margin: 40px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.btn-submit {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit:hover {
+    background: #000051;
+    box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+}
+
+/* QUICK ACTION BUTTON */
+.fab {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 60px;
+    height: 60px;
+    background: var(--accent);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 10px 25px rgba(197, 160, 89, 0.4);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.fab:hover { transform: rotate(90deg) scale(1.1); }
+
+/* FOOTER */
+.legal-footer {
+    padding: 40px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    border-top: 1px solid #eee;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .wing-wrapper { grid-template-columns: 1fr; }
+    .search-wrapper { width: 250px; }
+}
