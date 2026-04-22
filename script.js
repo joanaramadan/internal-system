@@ -5,7 +5,7 @@
 
 // === 1. КОНФИГУРАЦИЯ (ТВОИТЕ ДАННИ) ===
 const SB_URL = "https://qajmppuihmorlzljjltm.supabase.co";
-const SB_KEY = "sb_publishable_XPsK25mBIL5bvmVtuz-U2Ww_FDS-SLQ5";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFham1wcHVpaG1vcmx6bGpqbHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMjE4NDgsImV4cCI6MjA5MDY5Nzg0OH0.96UsQD5ux65hifaEdAOELFJU_T8E0s9764rLVTQcRvo";
 const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
 const TG_BOT_TOKEN = "8645929996:AAHIPLMxDYh-ycxdIKbuld92yDA36EWTFQE";
