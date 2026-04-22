@@ -3,75 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMS Bulgaria | Enterprise Hotel Management</title>
+    <title>HMS Bulgaria | Premium Hotel Management</title>
     
-    <!-- Външни библиотеки -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- LUXURY FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<div id="login-screen" class="login-overlay" style="display: none;">
+<!-- ЛОГИН С ГЛАСМОРФИЗЪМ И ЛУКСОЗЕН ФОН -->
+<div id="login-screen" class="login-overlay">
     <div class="login-box">
-        <div class="login-logo">🏛 HMS APOLLO & HELIOS</div>
-        <h2>Вход в системата</h2>
-        <input type="email" id="login-email" placeholder="Email">
-        <input type="password" id="login-pass" placeholder="Password">
-        <button class="btn-submit" onclick="handleLogin()">ВХОД</button>
-        <p class="login-footer">Enterprise Edition v3.0</p>
+        <h1 class="luxury-title">HMS Bulgaria</h1>
+        <h2 class="hotel-name-display">Apollo & Helios</h2>
+        <p class="login-subtitle">Management Console v5.0</p>
+        <div class="login-form">
+            <input type="email" id="login-email" placeholder="Email Address">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn-submit" onclick="handleLogin()">Влез в системата</button>
+        </div>
     </div>
 </div>
 
-<div class="sidebar" id="sidebar">
+<div class="sidebar">
     <div class="sidebar-header">
-        <span class="hotel-name">HMS BULGARIA</span>
-        <small>Premium Management</small>
+        <span class="hotel-brand">HMS BULGARIA</span>
+        <div id="digital-clock">00:00:00</div>
     </div>
-    <div class="nav-links">
-        <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> <span>Табло</span></div>
-        <div class="nav-item" onclick="switchTab('room-matrix')"><i class="fas fa-th"></i> <span>Матрица на стаите</span></div>
-        <div class="nav-group-label">ОПЕРАЦИИ</div>
-        <div class="nav-item" onclick="switchTab('maintenance')"><i class="fas fa-tools"></i> <span>Техн. поддръжка</span></div>
-        <div class="nav-item" onclick="switchTab('housekeeping')"><i class="fas fa-broom"></i> <span>Камериерки</span></div>
-        <div class="nav-item" onclick="switchTab('reception')"><i class="fas fa-concierge-bell"></i> <span>Рецепция</span></div>
-        <div class="nav-group-label">КОМУНИКАЦИЯ</div>
-        <div class="nav-item" onclick="switchTab('handover')"><i class="fas fa-book"></i> <span>Рапортна книга</span></div>
-        <div class="nav-item" onclick="switchTab('checklists')"><i class="fas fa-check-double"></i> <span>Чек-листи</span></div>
-        <div class="nav-item" onclick="switchTab('sop')"><i class="fas fa-graduation-cap"></i> <span>SOP Наръчник</span></div>
-        <div class="nav-group-label">СИГУРНОСТ</div>
-        <div class="nav-item danger" onclick="switchTab('incidents')"><i class="fas fa-ambulance"></i> <span>ИНЦИДЕНТИ</span></div>
-        <div class="nav-item" onclick="switchTab('reports')"><i class="fas fa-file-export"></i> <span>Отчети</span></div>
+    <div class="nav-links" id="main-nav">
+        <!-- Навигацията се генерира от JS -->
     </div>
-    <div class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Изход</span></div>
+    <div class="nav-item logout" onclick="handleLogout()">
+        <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Изход</span>
+    </div>
 </div>
 
 <div class="main-content">
     <div class="top-bar">
-        <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" placeholder="Търсене..." id="global-search"></div>
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" data-i18n-placeholder="search" placeholder="Търсене...">
+        </div>
         <div class="top-bar-right">
-            <div class="user-profile"><span id="user-email">...</span></div>
+            <select class="lang-select" onchange="changeLanguage(this.value)">
+                <option value="bg">BG 🇧🇬</option>
+                <option value="en">EN 🇬🇧</option>
+            </select>
+            <div class="user-profile">
+                <i class="fas fa-user-shield"></i>
+                <span id="user-email">...</span>
+            </div>
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div id="dashboard-section" class="section active">
-        <div class="kpi-container">
+        <h2 class="luxury-title-section">Табло за управление</h2>
+        <div class="kpi-container" id="kpi-grid">
             <div class="kpi-card"><h3>Активни задачи</h3><p id="kpi-tickets">0</p></div>
             <div class="kpi-card danger"><h3>Спешни сигнали</h3><p id="kpi-incidents">0</p></div>
         </div>
         <div class="card chart-card"><canvas id="statsChart"></canvas></div>
     </div>
 
+    <!-- ROOM MATRIX -->
     <div id="matrix-section" class="section" style="display: none;">
+        <h2 class="luxury-title-section">Матрица на капацитета</h2>
+        <div class="matrix-legend">
+            <span class="legend-item"><span class="dot clean"></span> Чиста</span>
+            <span class="legend-item"><span class="dot dirty"></span> Мръсна</span>
+            <span class="legend-item"><span class="dot process"></span> Почиства се</span>
+            <span class="legend-item"><span class="dot ooo"></span> Ремонт</span>
+        </div>
         <div class="wing-wrapper">
-            <div class="wing-container"><div class="wing-title">🏛 APOLLO</div><div id="apollo-grid" class="floor-grid"></div></div>
-            <div class="wing-container"><div class="wing-title">☀️ HELIOS</div><div id="helios-grid" class="floor-grid"></div></div>
+            <div class="wing-container">
+                <h3 class="wing-luxury-title">🏛 Apollo</h3>
+                <div id="apollo-grid" class="floor-grid"></div>
+            </div>
+            <div class="wing-container">
+                <h3 class="wing-luxury-title">☀️ Helios</h3>
+                <div id="helios-grid" class="floor-grid"></div>
+            </div>
         </div>
     </div>
 
+    <!-- DYNAMIC FORM CONTAINER -->
     <div id="form-container" class="section" style="display: none;"></div>
-    <div id="reports-section" class="section" style="display: none;"><div class="card"><h2>Отчети</h2><p>Тук можете да експортирате данни.</p></div></div>
+
+    <!-- LEGAL FOOTER -->
+    <footer class="legal-footer">
+        <div class="footer-grid">
+            <div class="legal-info">
+                <strong>HMS Bulgaria Security Protocol | Apollo & Helios</strong>
+                <p>Системата оперира в съответствие с <strong>GDPR (Регламент (ЕС) 2016/679)</strong> и <strong>Закона за туризма на РБ</strong>. Всички действия се записват в Audit Log и се съхраняват 5 години.</p>
+            </div>
+            <div class="legal-meta">
+                <div class="security-badges">
+                    <span><i class="fas fa-shield-alt"></i> SSL SECURE</span>
+                    <span><i class="fas fa-user-lock"></i> GDPR COMPLIANT</span>
+                </div>
+                <p class="copyright">© 2024 HMS Bulgaria. Developed by Premium Hotel Analytics Ltd.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- MODAL FOR STATUS -->
+<div id="room-status-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h3 id="modal-room-title" class="luxury-title-small">Стая</h3>
+        <p>Промяна на оперативен статус:</p>
+        <div class="status-options">
+            <button class="status-btn clean" onclick="updateRoomStatus('clean')">Чиста</button>
+            <button class="status-btn dirty" onclick="updateRoomStatus('dirty')">Мръсна</button>
+            <button class="status-btn process" onclick="updateRoomStatus('process')">В почистване</button>
+            <button class="status-btn ooo" onclick="updateRoomStatus('ooo')">Ремонт</button>
+        </div>
+        <button class="btn-close" onclick="closeModal()">Отказ</button>
+    </div>
 </div>
 
 <div class="fab" onclick="switchTab('maintenance')"><i class="fas fa-plus"></i></div>
