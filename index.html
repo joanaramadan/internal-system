@@ -1,156 +1,218 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hotel Console</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1724">
+    <title>Hotel Operations</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="dept-dashboard">
+<body>
 
-<div id="login-screen" class="login-screen" style="display:none;">
-    <div class="login-card">
-        <h2>Hotel Console</h2>
-        <input type="email" id="login-email" placeholder="Email" class="form-control">
-        <input type="password" id="login-pass" placeholder="Парола" class="form-control">
-        <button class="btn-submit" onclick="handleLogin()">Вход</button>
-    </div>
-</div>
-
-<header class="topbar">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <div class="brand">Hotel Console</div>
-    <div class="top-right">
-        <span id="digital-clock" class="clock"></span>
-        <span id="digital-clock-mob" class="clock mob"></span>
-        <span id="user-email" class="user-tag"></span>
-        <button class="btn-logout" onclick="handleLogout()">Изход</button>
-    </div>
-</header>
-
-<aside id="sidebar" class="sidebar">
-    <nav id="main-nav"></nav>
-    <div class="lang-switch">
-        <button onclick="changeLanguage('bg')">BG</button>
-        <button onclick="changeLanguage('en')">EN</button>
-    </div>
-</aside>
-
-<main class="main">
-
-    <section id="dashboard-section" class="section">
-        <div class="kpi-row">
-            <div class="kpi-card clickable" onclick="showRequestList('new')">
-                <div class="kpi-label">Активни заявки</div>
-                <div class="kpi-value" id="kpi-tickets">0</div>
-                <div class="kpi-hint">Виж всички →</div>
-            </div>
-            <div class="kpi-card clickable" onclick="showRequestList('today')">
-                <div class="kpi-label">Планирани днес</div>
-                <div class="kpi-value" id="kpi-today">0</div>
-                <div class="kpi-hint">Виж списък →</div>
-            </div>
-            <div class="kpi-card clickable" onclick="showRequestList('done')">
-                <div class="kpi-label">Изпълнени днес</div>
-                <div class="kpi-value" id="kpi-done">0</div>
-                <div class="kpi-hint">Виж история →</div>
-            </div>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>Натоварване</h3>
-                <div style="height:240px"><canvas id="statsChart"></canvas></div>
-            </div>
-            <div class="card">
-                <h3>Бъдещи заявки за днес</h3>
-                <div id="today-requests" class="today-list"></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="requests-list-section" class="section">
-        <div class="card">
-            <div class="list-header">
-                <h2 id="rl-title" class="section-title">Заявки</h2>
-                <div class="list-filters">
-                    <input type="text" id="rl-search" class="form-control" placeholder="Търси (стая, услуга, гост...)" oninput="renderRequestList()">
-                    <select id="rl-cat" class="form-control" onchange="renderRequestList()">
-                        <option value="">Всички отдели</option>
-                        <option value="housekeeping">Камериерки</option>
-                        <option value="maintenance">Поддръжка</option>
-                        <option value="reception">Рецепция</option>
-                        <option value="guest_relations">Guest Relations</option>
-                        <option value="restaurant">Ресторант</option>
-                    </select>
-                    <button class="btn-secondary" onclick="exportRequestListCSV()">⬇ CSV</button>
+    <!-- ============== LOGIN ============== -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-brand">
+                <div class="brand-mark">H</div>
+                <div>
+                    <h1 class="brand-name">Hotel Operations</h1>
+                    <p class="brand-sub">Внутрешна система за управление</p>
                 </div>
             </div>
-            <div id="rl-table"></div>
-        </div>
-    </section>
 
-    <section id="matrix-section" class="section">
-        <div class="matrix-header">
-            <h2 class="section-title">Матрица на стаите</h2>
-            <div class="matrix-legend">
-                <span class="lg clean">Чиста</span>
-                <span class="lg dirty">Мръсна</span>
-                <span class="lg occupied">Заета</span>
-                <span class="lg maintenance">Поддръжка</span>
-            </div>
-        </div>
-        <div class="wing-card">
-            <h3>Apollo Wing</h3>
-            <div id="apollo-grid" class="floor-grid"></div>
-        </div>
-        <div class="wing-card">
-            <h3>Helios Wing</h3>
-            <div id="helios-grid" class="floor-grid"></div>
-        </div>
-    </section>
+            <label class="field-label">Имейл</label>
+            <input type="email" id="login-email" class="form-control" placeholder="name@hotel.com" autocomplete="username">
 
-    <section id="form-container" class="section"></section>
+            <label class="field-label">Парола</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="••••••••" autocomplete="current-password">
 
-    <section id="suggestions-section" class="section">
-        <div class="card">
-            <h2 class="section-title">💡 Предложения за гости</h2>
-            <p class="muted">Изберете категория, за да видите готови препоръки за гостите.</p>
-            <div id="suggestions-grid" class="suggestions-grid"></div>
+            <button class="btn-primary" onclick="handleLogin()">Влез в системата</button>
+
+            <p class="login-foot">© Hotel Operations · v2.0</p>
         </div>
-        <div id="suggestions-detail" class="card" style="display:none;"></div>
-    </section>
-
-    <section id="manager-section" class="section">
-        <div class="card">
-            <h2 class="section-title">📈 Управление и отчети</h2>
-            <div class="mgr-tabs">
-                <button class="mgr-tab active" onclick="switchMgrTab('overview', this)">Преглед</button>
-                <button class="mgr-tab" onclick="switchMgrTab('history', this)">История</button>
-                <button class="mgr-tab" onclick="switchMgrTab('stats', this)">Статистики</button>
-                <button class="mgr-tab" onclick="switchMgrTab('handovers', this)">Предавания</button>
-            </div>
-            <div id="mgr-content"></div>
-        </div>
-    </section>
-
-</main>
-
-<div id="room-status-modal" class="modal" style="display:none;">
-    <div class="modal-card">
-        <h3 id="modal-room-title"></h3>
-        <button onclick="updateRoomStatus('clean')">✅ Чиста</button>
-        <button onclick="updateRoomStatus('dirty')">🧹 Мръсна</button>
-        <button onclick="updateRoomStatus('occupied')">👤 Заета</button>
-        <button onclick="updateRoomStatus('maintenance')">🛠 Поддръжка</button>
-        <button class="btn-secondary" onclick="closeModal()">Затвори</button>
     </div>
-</div>
+<!-- ============== APP SHELL ============== -->
+    <div class="app-shell">
 
-<button class="fab" onclick="switchTab('suggestions')" title="Предложения за гости">+</button>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-mark">H</div>
+                <div class="brand-text">
+                    <span class="brand-name-sm">Hotel Ops</span>
+                    <span class="brand-sub-sm">Operations Suite</span>
+                </div>
+            </div>
 
-<script src="script.js"></script>
+            <nav id="main-nav" class="main-nav"><!-- rendered by ui.js --></nav>
+
+            <div class="sidebar-foot">
+                <div class="user-card">
+                    <div class="user-avatar">●</div>
+                    <div class="user-meta">
+                        <span class="user-label">Влязъл като</span>
+                        <span id="user-email" class="user-email">—</span>
+                    </div>
+                </div>
+                <button class="btn-ghost" onclick="handleLogout()">Изход</button>
+            </div>
+        </aside>
+
+        <!-- Backdrop for mobile sidebar -->
+        <div class="sidebar-backdrop" onclick="closeSidebarIfOpen()"></div>
+
+        <!-- Main -->
+        <main class="main">
+
+            <!-- Top bar -->
+            <header class="topbar">
+                <button class="icon-btn menu-btn" onclick="toggleSidebar()" aria-label="Меню">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <div class="topbar-title">
+                    <span class="eyebrow">Operations</span>
+                    <span class="page-title">Командно табло</span>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="lang-toggle" role="tablist">
+                        <button onclick="changeLanguage('bg')" class="lang-btn active">BG</button>
+                        <button onclick="changeLanguage('en')" class="lang-btn">EN</button>
+                    </div>
+
+                    <div class="clock-wrap">
+                        <span id="digital-clock" class="clock-desk">--:--:--</span>
+                        <span id="digital-clock-mob" class="clock-mob">--:--</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+
+                <!-- ===== Dashboard ===== -->
+                <section id="dashboard-section" class="section active">
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card kpi-amber">
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            </div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Активни заявки</span>
+                                <span id="kpi-tickets" class="kpi-value">0</span>
+                                <span class="kpi-trend">в момента</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card kpi-navy">
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            </div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Планирани днес</span>
+                                <span id="kpi-today" class="kpi-value">0</span>
+                                <span class="kpi-trend">за деня</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card kpi-emerald">
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+                            </div>
+                            <div class="kpi-meta">
+                                <span class="kpi-label">Натоварване</span>
+                                <span class="kpi-value">live</span>
+                                <span class="kpi-trend">по часове</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-grid">
+                        <div class="card chart-card">
+                            <div class="card-head">
+                                <h3 class="card-title">Активност за деня</h3>
+                                <span class="card-hint">Заявки по часове</span>
+                            </div>
+                            <div class="chart-wrap">
+                                <canvas id="statsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card today-card">
+                            <div class="card-head">
+                                <h3 class="card-title">Планирани за днес</h3>
+                                <span class="card-hint">Telegram уведомления</span>
+                            </div>
+                            <div id="today-requests" class="today-list">
+                                <p class="empty-state">Няма планирани заявки за днес.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ===== Room Matrix ===== -->
+                <section id="matrix-section" class="section">
+                    <div class="card">
+                        <div class="card-head">
+                            <h3 class="card-title">Карта на стаите</h3>
+                            <div class="legend">
+                                <span class="legend-item"><span class="dot dot-clean"></span>Чиста</span>
+                                <span class="legend-item"><span class="dot dot-dirty"></span>Мръсна</span>
+                                <span class="legend-item"><span class="dot dot-occupied"></span>Заета</span>
+                                <span class="legend-item"><span class="dot dot-oo"></span>OOO / Out</span>
+                            </div>
+                        </div>
+
+                        <div class="wing">
+                            <h4 class="wing-title">Apollo Wing</h4>
+                            <div id="apollo-grid" class="floor-grid"></div>
+<!-- ============== ROOM STATUS MODAL ============== -->
+    <div id="room-status-modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 id="modal-room-title">Стая</h3>
+                <button class="icon-btn" onclick="closeModal()" aria-label="Затвори">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="modal-sub">Промени статус</p>
+            <div class="status-grid">
+                <button class="status-btn s-clean"    onclick="updateRoomStatus('clean')">Чиста</button>
+                <button class="status-btn s-dirty"    onclick="updateRoomStatus('dirty')">Мръсна</button>
+                <button class="status-btn s-occupied" onclick="updateRoomStatus('occupied')">Заета</button>
+                <button class="status-btn s-oo"       onclick="updateRoomStatus('oo')">OOO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============== Vendor + App ============== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/rooms.js"></script>
+    <script src="js/forms.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/tickets.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Tiny enhancement: language buttons get a visual active state
+        document.querySelectorAll('.lang-btn').forEach(b => {
+            b.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
