@@ -1,123 +1,155 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HMS Bulgaria | Premium Hotel Console</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Console</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="dept-dashboard">
 
-<div id="login-screen" class="login-overlay">
-    <div class="login-box">
-        <h1 class="luxury-title">HMS Bulgaria</h1>
-        <p class="login-subtitle">Premium Hotel Management</p>
-        <div class="login-form">
-            <input type="email" id="login-email" placeholder="Email Address">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button class="btn-submit" onclick="handleLogin()">Вход</button>
-        </div>
+<div id="login-screen" class="login-screen" style="display:none;">
+    <div class="login-card">
+        <h2>Hotel Console</h2>
+        <input type="email" id="login-email" placeholder="Email" class="form-control">
+        <input type="password" id="login-pass" placeholder="Парола" class="form-control">
+        <button class="btn-submit" onclick="handleLogin()">Вход</button>
     </div>
 </div>
 
-<div class="mobile-header">
-    <button id="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <span class="hotel-brand">HMS BULGARIA</span>
-    <div id="digital-clock-mob">00:00</div>
-</div>
-
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <span class="hotel-brand">HMS BULGARIA</span>
-        <div id="digital-clock">00:00:00</div>
+<header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div class="brand">Hotel Console</div>
+    <div class="top-right">
+        <span id="digital-clock" class="clock"></span>
+        <span id="digital-clock-mob" class="clock mob"></span>
+        <span id="user-email" class="user-tag"></span>
+        <button class="btn-logout" onclick="handleLogout()">Изход</button>
     </div>
-    <div class="nav-links" id="main-nav"></div>
-    <div class="nav-item logout" onclick="handleLogout()">
-        <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Изход</span>
+</header>
+
+<aside id="sidebar" class="sidebar">
+    <nav id="main-nav"></nav>
+    <div class="lang-switch">
+        <button onclick="changeLanguage('bg')">BG</button>
+        <button onclick="changeLanguage('en')">EN</button>
     </div>
-</div>
+</aside>
 
-<div class="main-content" id="main-content" onclick="closeSidebarIfOpen()">
-    <div class="top-bar desktop-only">
-        <div class="search-wrapper">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Търсене...">
-        </div>
-        <div class="top-bar-right">
-            <select class="lang-select" onchange="changeLanguage(this.value)">
-                <option value="bg">BG 🇧🇬</option>
-                <option value="en">EN 🇬🇧</option>
-            </select>
-            <div class="user-profile"><i class="fas fa-user-shield"></i> <span id="user-email">...</span></div>
-        </div>
-    </div>
+<main class="main">
 
-    <div id="dashboard-section" class="section">
-        <h2 class="section-title">Табло</h2>
-        <div class="kpi-container" id="kpi-grid">
-            <div class="kpi-card"><h3>Активни задачи</h3><p id="kpi-tickets">0</p></div>
-            <div class="kpi-card danger"><h3>Инциденти</h3><p id="kpi-incidents">0</p></div>
-            <div class="kpi-card warn"><h3>Заявки за днес</h3><p id="kpi-today">0</p></div>
-        </div>
-
-        <div class="card">
-            <h3 class="card-title">Планирани заявки за днес</h3>
-            <div id="today-requests" class="today-list">
-                <p class="empty-state">Няма планирани заявки за днес.</p>
+    <section id="dashboard-section" class="section">
+        <div class="kpi-row">
+            <div class="kpi-card clickable" onclick="showRequestList('new')">
+                <div class="kpi-label">Активни заявки</div>
+                <div class="kpi-value" id="kpi-tickets">0</div>
+                <div class="kpi-hint">Виж всички →</div>
+            </div>
+            <div class="kpi-card clickable" onclick="showRequestList('today')">
+                <div class="kpi-label">Планирани днес</div>
+                <div class="kpi-value" id="kpi-today">0</div>
+                <div class="kpi-hint">Виж списък →</div>
+            </div>
+            <div class="kpi-card clickable" onclick="showRequestList('done')">
+                <div class="kpi-label">Изпълнени днес</div>
+                <div class="kpi-value" id="kpi-done">0</div>
+                <div class="kpi-hint">Виж история →</div>
             </div>
         </div>
 
-        <div class="card chart-card"><canvas id="statsChart"></canvas></div>
-    </div>
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Натоварване</h3>
+                <div style="height:240px"><canvas id="statsChart"></canvas></div>
+            </div>
+            <div class="card">
+                <h3>Бъдещи заявки за днес</h3>
+                <div id="today-requests" class="today-list"></div>
+            </div>
+        </div>
+    </section>
 
-    <div id="matrix-section" class="section" style="display:none;">
+    <section id="requests-list-section" class="section">
+        <div class="card">
+            <div class="list-header">
+                <h2 id="rl-title" class="section-title">Заявки</h2>
+                <div class="list-filters">
+                    <input type="text" id="rl-search" class="form-control" placeholder="Търси (стая, услуга, гост...)" oninput="renderRequestList()">
+                    <select id="rl-cat" class="form-control" onchange="renderRequestList()">
+                        <option value="">Всички отдели</option>
+                        <option value="housekeeping">Камериерки</option>
+                        <option value="maintenance">Поддръжка</option>
+                        <option value="reception">Рецепция</option>
+                        <option value="guest_relations">Guest Relations</option>
+                        <option value="restaurant">Ресторант</option>
+                    </select>
+                    <button class="btn-secondary" onclick="exportRequestListCSV()">⬇ CSV</button>
+                </div>
+            </div>
+            <div id="rl-table"></div>
+        </div>
+    </section>
+
+    <section id="matrix-section" class="section">
         <div class="matrix-header">
             <h2 class="section-title">Матрица на стаите</h2>
-            <div class="matrix-legend" id="matrix-legend">
-                <span class="legend-item"><span class="legend-dot clean"></span>Чиста</span>
-                <span class="legend-item"><span class="legend-dot dirty"></span>Мръсна</span>
-                <span class="legend-item"><span class="legend-dot process"></span>В почистване</span>
-                <span class="legend-item"><span class="legend-dot ooo"></span>Ремонт</span>
+            <div class="matrix-legend">
+                <span class="lg clean">Чиста</span>
+                <span class="lg dirty">Мръсна</span>
+                <span class="lg occupied">Заета</span>
+                <span class="lg maintenance">Поддръжка</span>
             </div>
         </div>
-        <div id="matrix-container" class="wing-wrapper">
-            <div class="wing-container"><h3>🏛 Apollo</h3><div id="apollo-grid" class="floor-grid"></div></div>
-            <div class="wing-container"><h3>☀️ Helios</h3><div id="helios-grid" class="floor-grid"></div></div>
+        <div class="wing-card">
+            <h3>Apollo Wing</h3>
+            <div id="apollo-grid" class="floor-grid"></div>
         </div>
-    </div>
+        <div class="wing-card">
+            <h3>Helios Wing</h3>
+            <div id="helios-grid" class="floor-grid"></div>
+        </div>
+    </section>
 
-    <div id="form-container" class="section" style="display:none;"></div>
+    <section id="form-container" class="section"></section>
 
-    <footer class="legal-footer">
-        <div class="footer-grid">
-            <div class="legal-info">
-                <strong>HMS Bulgaria | GDPR & Legal Compliance</strong>
-                <p>Всички действия се записват в Audit Log. Съхранение: 5 години съгласно ЗТ.</p>
+    <section id="suggestions-section" class="section">
+        <div class="card">
+            <h2 class="section-title">💡 Предложения за гости</h2>
+            <p class="muted">Изберете категория, за да видите готови препоръки за гостите.</p>
+            <div id="suggestions-grid" class="suggestions-grid"></div>
+        </div>
+        <div id="suggestions-detail" class="card" style="display:none;"></div>
+    </section>
+
+    <section id="manager-section" class="section">
+        <div class="card">
+            <h2 class="section-title">📈 Управление и отчети</h2>
+            <div class="mgr-tabs">
+                <button class="mgr-tab active" onclick="switchMgrTab('overview', this)">Преглед</button>
+                <button class="mgr-tab" onclick="switchMgrTab('history', this)">История</button>
+                <button class="mgr-tab" onclick="switchMgrTab('stats', this)">Статистики</button>
+                <button class="mgr-tab" onclick="switchMgrTab('handovers', this)">Предавания</button>
             </div>
-            <p class="copyright">© 2024 HMS Bulgaria. Dev: Premium Hotel Analytics Ltd.</p>
+            <div id="mgr-content"></div>
         </div>
-    </footer>
-</div>
+    </section>
 
-<div id="room-status-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-        <h3 id="modal-room-title">Стая</h3>
-        <div class="status-options">
-            <button class="status-btn clean" onclick="updateRoomStatus('clean')">Чиста</button>
-            <button class="status-btn dirty" onclick="updateRoomStatus('dirty')">Мръсна</button>
-            <button class="status-btn process" onclick="updateRoomStatus('process')">В почистване</button>
-            <button class="status-btn ooo" onclick="updateRoomStatus('ooo')">Ремонт</button>
-        </div>
-        <button class="btn-close" onclick="closeModal()">Затвори</button>
+</main>
+
+<div id="room-status-modal" class="modal" style="display:none;">
+    <div class="modal-card">
+        <h3 id="modal-room-title"></h3>
+        <button onclick="updateRoomStatus('clean')">✅ Чиста</button>
+        <button onclick="updateRoomStatus('dirty')">🧹 Мръсна</button>
+        <button onclick="updateRoomStatus('occupied')">👤 Заета</button>
+        <button onclick="updateRoomStatus('maintenance')">🛠 Поддръжка</button>
+        <button class="btn-secondary" onclick="closeModal()">Затвори</button>
     </div>
 </div>
 
-<div class="fab" onclick="switchTab('maintenance')"><i class="fas fa-plus"></i></div>
+<button class="fab" onclick="switchTab('suggestions')" title="Предложения за гости">+</button>
 
 <script src="script.js"></script>
 </body>
