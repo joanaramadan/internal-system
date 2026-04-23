@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HMS Bulgaria | Premium Hotel Console</title>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- ЛОГИН -->
 <div id="login-screen" class="login-overlay">
     <div class="login-box">
         <h1 class="luxury-title">HMS Bulgaria</h1>
@@ -26,14 +25,12 @@
     </div>
 </div>
 
-<!-- МОБИЛНА ГОРНА ЛЕНТА -->
 <div class="mobile-header">
     <button id="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
     <span class="hotel-brand">HMS BULGARIA</span>
     <div id="digital-clock-mob">00:00</div>
 </div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <span class="hotel-brand">HMS BULGARIA</span>
@@ -45,7 +42,6 @@
     </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main-content" id="main-content" onclick="closeSidebarIfOpen()">
     <div class="top-bar desktop-only">
         <div class="search-wrapper">
@@ -61,19 +57,35 @@
         </div>
     </div>
 
-    <!-- КОНТЕЙНЕРИ ЗА СЕКЦИИ -->
     <div id="dashboard-section" class="section">
         <h2 class="section-title">Табло</h2>
         <div class="kpi-container" id="kpi-grid">
-            <div class="kpi-card"><h3>Задачи</h3><p id="kpi-tickets">0</p></div>
+            <div class="kpi-card"><h3>Активни задачи</h3><p id="kpi-tickets">0</p></div>
             <div class="kpi-card danger"><h3>Инциденти</h3><p id="kpi-incidents">0</p></div>
+            <div class="kpi-card warn"><h3>Заявки за днес</h3><p id="kpi-today">0</p></div>
         </div>
+
+        <div class="card">
+            <h3 class="card-title">Планирани заявки за днес</h3>
+            <div id="today-requests" class="today-list">
+                <p class="empty-state">Няма планирани заявки за днес.</p>
+            </div>
+        </div>
+
         <div class="card chart-card"><canvas id="statsChart"></canvas></div>
     </div>
 
     <div id="matrix-section" class="section" style="display:none;">
-        <h2 class="section-title">Матрица</h2>
-        <div id="matrix-container">
+        <div class="matrix-header">
+            <h2 class="section-title">Матрица на стаите</h2>
+            <div class="matrix-legend" id="matrix-legend">
+                <span class="legend-item"><span class="legend-dot clean"></span>Чиста</span>
+                <span class="legend-item"><span class="legend-dot dirty"></span>Мръсна</span>
+                <span class="legend-item"><span class="legend-dot process"></span>В почистване</span>
+                <span class="legend-item"><span class="legend-dot ooo"></span>Ремонт</span>
+            </div>
+        </div>
+        <div id="matrix-container" class="wing-wrapper">
             <div class="wing-container"><h3>🏛 Apollo</h3><div id="apollo-grid" class="floor-grid"></div></div>
             <div class="wing-container"><h3>☀️ Helios</h3><div id="helios-grid" class="floor-grid"></div></div>
         </div>
@@ -92,7 +104,6 @@
     </footer>
 </div>
 
-<!-- МОДАЛ -->
 <div id="room-status-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
         <h3 id="modal-room-title">Стая</h3>
