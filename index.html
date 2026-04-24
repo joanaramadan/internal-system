@@ -4,13 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0f1724">
-    <title>Hotel Operations</title>
+    <title>HMS Bulgaria — Hotel Operations</title>
 
+    <!-- Icons & PWA -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HMS Ops">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Sentry (optional) — replace YOUR_SENTRY_DSN_HERE with your DSN after sentry.io signup -->
+    <script src="https://browser.sentry-cdn.com/8.0.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+    <script>
+        if (window.Sentry) {
+            Sentry.init({
+                dsn: 'YOUR_SENTRY_DSN_HERE',
+                tracesSampleRate: 0.1,
+                environment: location.hostname.includes('localhost') ? 'dev' : 'prod'
+            });
+        }
+    </script>
+
+    <!-- Vercel Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -20,7 +46,7 @@
             <div class="login-brand">
                 <div class="brand-mark">H</div>
                 <div>
-                    <h1 class="brand-name">Hotel Operations</h1>
+                    <h1 class="brand-name">HMS Bulgaria</h1>
                     <p class="brand-sub">Внутрешна система за управление</p>
                 </div>
             </div>
@@ -33,18 +59,18 @@
 
             <button class="btn-primary" onclick="handleLogin()">Влез в системата</button>
 
-            <p class="login-foot">© Hotel Operations · v2.0</p>
+            <p class="login-foot">© HMS Bulgaria · v2.1</p>
         </div>
     </div>
-<!-- ============== APP SHELL ============== -->
+
+    <!-- ============== APP SHELL ============== -->
     <div class="app-shell">
 
-        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-mark">H</div>
                 <div class="brand-text">
-                    <span class="brand-name-sm">Hotel Ops</span>
+                    <span class="brand-name-sm">HMS Bulgaria</span>
                     <span class="brand-sub-sm">Operations Suite</span>
                 </div>
             </div>
@@ -63,13 +89,10 @@
             </div>
         </aside>
 
-        <!-- Backdrop for mobile sidebar -->
         <div class="sidebar-backdrop" onclick="closeSidebarIfOpen()"></div>
 
-        <!-- Main -->
         <main class="main">
 
-            <!-- Top bar -->
             <header class="topbar">
                 <button class="icon-btn menu-btn" onclick="toggleSidebar()" aria-label="Меню">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -93,10 +116,8 @@
                 </div>
             </header>
 
-            <!-- Content -->
             <div class="content">
 
-                <!-- ===== Dashboard ===== -->
                 <section id="dashboard-section" class="section active">
 
                     <div class="kpi-grid">
@@ -158,7 +179,6 @@
 
                 </section>
 
-                <!-- ===== Room Matrix ===== -->
                 <section id="matrix-section" class="section">
                     <div class="card">
                         <div class="card-head">
@@ -174,7 +194,22 @@
                         <div class="wing">
                             <h4 class="wing-title">Apollo Wing</h4>
                             <div id="apollo-grid" class="floor-grid"></div>
-<!-- ============== ROOM STATUS MODAL ============== -->
+                        </div>
+
+                        <div class="wing">
+                            <h4 class="wing-title">Helios Wing</h4>
+                            <div id="helios-grid" class="floor-grid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="form-container" class="section"></section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ============== ROOM STATUS MODAL ============== -->
     <div id="room-status-modal" class="modal">
         <div class="modal-card">
             <div class="modal-head">
@@ -204,15 +239,21 @@
     <script src="js/dashboard.js"></script>
     <script src="js/tickets.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/realtime.js"></script>
 
     <script>
-        // Tiny enhancement: language buttons get a visual active state
         document.querySelectorAll('.lang-btn').forEach(b => {
             b.addEventListener('click', () => {
                 document.querySelectorAll('.lang-btn').forEach(x => x.classList.remove('active'));
                 b.classList.add('active');
             });
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(console.error);
+            });
+        }
     </script>
 </body>
 </html>
