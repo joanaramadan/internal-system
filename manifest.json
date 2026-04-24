@@ -1,7 +1,7 @@
 {
-    "name": "HMS Bulgaria — Hotel Management System",
-    "short_name": "HMS Bulgaria",
-    "description": "Вътрешна оперативна система за хотелско управление",
+    "name": "HMS Bulgaria — Hotel Operations",
+    "short_name": "HMS Ops",
+    "description": "Внутрешна система за управление",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f1724",
